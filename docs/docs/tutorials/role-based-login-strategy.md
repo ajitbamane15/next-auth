@@ -39,23 +39,33 @@ Going forward, when using the `getSession` hook, check that `session.user.role` 
 import { getSession } from "next-auth/react"
 
 export default function Page() {
-  const session = await getSession({ req })
 
-  if (session && session.user.role === "admin") {
     return (
       <div>
-        <h1>Admin</h1>
-        <p>Welcome to the Admin Portal!</p>
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <h1>You are not authorized to view this page!</h1>
+        // your secure page here
       </div>
     )
   }
-}
-```
+  
+ export async function getServerSideProps(context) {
+  const session = await getSession(context)
+  if (session.user.role === "admin") {
+  // fetch the data here or keep as it is if no props there it will take care of authorization
+    return {
+      props: {
 
-Then it is up to you how you manage your roles, either through direct database access or building your own role update API.
+      }
+    }
+  }
+  else {
+    return {
+      redirect: {
+        destination: '/unauthorised',
+        permanent: false,
+      },
+    }
+  }
+} 
+   
+```
+You can create a unauthorised page and redirect if user role is not required.Then it is up to you how you manage your roles, either through direct database access or building your own role update API.
